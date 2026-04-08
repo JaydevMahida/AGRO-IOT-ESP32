@@ -1,0 +1,99 @@
+// ===== IR PINS =====
+#define IR_LEFT  2
+#define IR_RIGHT 3
+
+// ===== RIGHT MOTOR =====
+int IN1 = 5;
+int IN2 = 6;
+int ENA = 9;
+
+// ===== LEFT MOTOR =====
+int IN3 = 7;
+int IN4 = 8;
+int ENB = 10;
+
+// ===== ULTRA SLOW SPEED SETTINGS =====
+int baseSpeed = 80;    // very slow forward
+int turnFast = 90;     // slightly faster motor
+int turnSlow = 40;     // very slow motor
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(IR_LEFT, INPUT);
+  pinMode(IR_RIGHT, INPUT);
+
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(ENA, OUTPUT);
+
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(ENB, OUTPUT);
+}
+
+// ===== MOTOR FUNCTIONS =====
+void forward() {
+  analogWrite(ENA, baseSpeed);
+  analogWrite(ENB, baseSpeed);
+
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void turnLeft() {
+  analogWrite(ENA, turnFast);
+  analogWrite(ENB, turnSlow);
+
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void turnRight() {
+  analogWrite(ENA, turnSlow);
+  analogWrite(ENB, turnFast);
+
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void stopMotors() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+void loop() {
+  int left = digitalRead(IR_LEFT);
+  int right = digitalRead(IR_RIGHT);
+
+  Serial.print("L:");
+  Serial.print(left);
+  Serial.print(" R:");
+  Serial.println(right);
+
+  // 🔁 SWAPPED LOGIC
+  if (left == 0 && right == 0) {
+    forward();
+  }
+  else if (left == 0 && right == 1) {
+    turnRight();
+  }
+  else if (left == 1 && right == 0) {
+    turnLeft();
+  }
+  else {
+    stopMotors();
+  }
+}
